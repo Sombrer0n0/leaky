@@ -40,8 +40,10 @@ ChannelResolvedCircuit resolve_bound_channels_in_circuit(
             if (it == simulator.bound_leaky_channels.end()) {
                 continue;
             }
-            resolved_circuit.channels.push_back({split_targets, it->second});
-            resolved_circuit.order.push_back({false, channel_idx++});
+            for (const auto &c : it->second){
+                resolved_circuit.channels.push_back({split_targets, c});
+                resolved_circuit.order.push_back({false, channel_idx++});
+            }
         }
     }
     return resolved_circuit;
@@ -90,7 +92,7 @@ void leaky_pybind::pybind_simulator_methods(py::module &m, py::class_<leaky::Sim
            const leaky::LeakyPauliChannel &channel) {
             auto targets = std::vector<stim::GateTarget>();
             for (const auto &obj : target_objs) {
-                targets.push_back(leaky_pybind::obj_to_gate_target(obj));
+                targets.push_back(obj_to_gate_target(obj));
             }
             self.apply_1q_leaky_pauli_channel({targets}, channel);
         },
@@ -104,7 +106,7 @@ void leaky_pybind::pybind_simulator_methods(py::module &m, py::class_<leaky::Sim
            const leaky::LeakyPauliChannel &channel) {
             auto targets = std::vector<stim::GateTarget>();
             for (const auto &obj : target_objs) {
-                targets.push_back(leaky_pybind::obj_to_gate_target(obj));
+                targets.push_back(obj_to_gate_target(obj));
             }
             self.apply_2q_leaky_pauli_channel({targets}, channel);
         },

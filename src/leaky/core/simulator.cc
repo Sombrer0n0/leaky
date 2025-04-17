@@ -48,7 +48,10 @@ void leaky::Simulator::bind_leaky_channel(
     if (!(stim::GATE_DATA[ideal_inst.gate_type].flags & stim::GATE_IS_UNITARY)) {
         throw std::invalid_argument("Only unitary gates can be binded with a leaky channel.");
     }
-    bound_leaky_channels.insert({inst_id, channel});
+    if (bound_leaky_channels[inst_id].empty()){
+        bound_leaky_channels[inst_id].reserve(3);
+    }
+    bound_leaky_channels[inst_id].push_back(channel);
 }
 
 void leaky::Simulator::apply_1q_leaky_pauli_channel(
@@ -146,11 +149,12 @@ void leaky::Simulator::do_gate(const stim::CircuitInstruction& inst, bool look_u
         if (it == bound_leaky_channels.end()) {
             continue;
         }
-        const auto& channel = it->second;
+        const auto& channels = it->second;
+        for (const auto& c: channels)
         if (is_single_qubit_gate) {
-            apply_1q_leaky_pauli_channel(split_targets, channel);
+            apply_1q_leaky_pauli_channel(split_targets, c);
         } else {
-            apply_2q_leaky_pauli_channel(split_targets, channel);
+            apply_2q_leaky_pauli_channel(split_targets, c);
         }
     }
 }

@@ -68,7 +68,8 @@ void leaky::LeakyPauliChannel::add_transition(
     auto it = std::find(initial_status_vec.begin(), initial_status_vec.end(), initial_status);
     if (it != initial_status_vec.end()) {
         auto idx = std::distance(initial_status_vec.begin(), it);
-        transitions[idx].emplace_back(std::make_pair(final_status, pauli_channel_idx));
+        auto pair_tmp = std::make_pair(final_status,pauli_channel_idx);
+        auto it_trans = std::find(transitions[idx].begin(),transitions[idx].end(),pair_tmp);
         auto &probs = cumulative_probs[idx];
         auto cum_prob = probs.back() + probability;
         if (cum_prob - 1.0 > 1e-6) {
@@ -76,7 +77,16 @@ void leaky::LeakyPauliChannel::add_transition(
                 "sum of probabilities for each initial status should not exceed 1, but get " + std::to_string(cum_prob);
             throw std::runtime_error(error_msg);
         }
-        probs.push_back(cum_prob);
+        if (it_trans != transitions[idx].end()){
+            auto idx_trans = std::distance(transitions[idx].begin(),it_trans);
+            for (auto idx_tmp = idx_trans;idx_tmp<probs.size();idx_tmp++) {
+                probs[idx_tmp] += probability;
+            }
+        }
+        else{
+            transitions[idx].push_back(pair_tmp);
+            probs.push_back(cum_prob);
+        }
     } else {
         initial_status_vec.push_back(initial_status);
         transitions.push_back(std::vector<transition>{std::make_pair(final_status, pauli_channel_idx)});

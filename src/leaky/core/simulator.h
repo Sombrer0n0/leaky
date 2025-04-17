@@ -16,7 +16,7 @@ struct Simulator {
     std::vector<uint8_t> leakage_status;
     std::vector<uint8_t> leakage_masks_record;
     stim::TableauSimulator<stim::MAX_BITWORD_WIDTH> tableau_simulator;
-    std::unordered_map<size_t, LeakyPauliChannel> bound_leaky_channels;
+    std::unordered_map<size_t, std::vector<LeakyPauliChannel>> bound_leaky_channels;
 
     explicit Simulator(uint32_t num_qubits);
 

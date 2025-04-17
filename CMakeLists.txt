@@ -72,13 +72,13 @@ endif ()
 target_link_libraries(leaky_tests GTest::gtest_main GTest::gmock_main libstim)
 
 add_library(libleaky ${SOURCE_FILES_NO_MAIN})
-set_target_properties(libleaky PROPERTIES PREFIX "")
+# set_target_properties(libleaky PROPERTIES PREFIX "")
 target_include_directories(libleaky PUBLIC src)
-target_compile_options(libleaky PRIVATE ${ARCH_OPT} -fPIC)
-if(NOT(MSVC))
-    target_link_options(libleaky PRIVATE -pthread -O3)
-endif()
-target_link_libraries(libleaky libstim)
+target_compile_options(libleaky PRIVATE 
+    $<$<CONFIG:Release>:${ARCH_OPT}>
+    $<$<CONFIG:Debug>:-O0 -g -fno-omit-frame-pointer>   
+)
+target_link_libraries(libleaky PUBLIC libstim pthread)
 install(TARGETS libleaky LIBRARY DESTINATION)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/" DESTINATION "include" FILES_MATCHING PATTERN "*.h" PATTERN "*.inl")
 
@@ -91,8 +91,11 @@ IF(EXISTS ${CMAKE_CURRENT_LIST_DIR}/pybind11/CMakeLists.txt)
     # In order to use `stim::PyCircuitInstruction`
     # we need to compile with some stim's python api files
     pybind11_add_module(_cpp_leaky ${PYTHON_API_FILES} ${SOURCE_FILES_NO_MAIN})
-    target_link_libraries(_cpp_leaky PRIVATE libstim)
-    target_compile_options(_cpp_leaky PRIVATE ${ARCH_OPT})
+    target_link_libraries(_cpp_leaky PRIVATE libleaky libstim)
+    target_compile_options(_cpp_leaky PRIVATE
+        $<$<CONFIG:Release>:${ARCH_OPT}>
+        $<$<CONFIG:Debug>:-O0 -g -fno-omit-frame-pointer>
+    )
 else()
     message("WARNING: Skipped the pybind11 module _cpp_leaky because the `pybind11` git submodule isn't present. To fix, run `git submodule update --init --recursive`")
 endif()
