@@ -13,6 +13,7 @@ py::class_<leaky::LeakyPauliChannel> leaky_pybind::pybind_channel(py::module &m)
 
 void leaky_pybind::pybind_channel_methods(py::module &m, py::class_<leaky::LeakyPauliChannel> &c) {
     c.def(py::init<bool>(), py::arg("is_single_qubit_channel") = py::bool_(true));
+    // c.def(py::init<bool,std>() , std::vector<stim::GateTarget>)
     c.def_property_readonly("num_transitions", &leaky::LeakyPauliChannel::num_transitions);
     c.def(
         "add_transition",
