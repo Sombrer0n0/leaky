@@ -1,5 +1,5 @@
 #include "leaky/core/simulator.pybind.h"
-
+#include "leaky/core/gatetarget_trans.h"
 #include <cstddef>
 #include <iterator>
 #include <pybind11/cast.h>
@@ -41,7 +41,13 @@ ChannelResolvedCircuit resolve_bound_channels_in_circuit(
                 continue;
             }
             for (const auto &c : it->second){
-                resolved_circuit.channels.push_back({split_targets, c});
+                if (c.is_independent_channel) {
+                    stim::SpanRef<const stim::GateTarget> split_targets_tmp(c.independent_targets);
+                    resolved_circuit.channels.push_back({split_targets_tmp, c});
+                }
+                else{
+                    resolved_circuit.channels.push_back({split_targets, c});
+                }
                 resolved_circuit.order.push_back({false, channel_idx++});
             }
         }

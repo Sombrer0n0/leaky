@@ -12,3 +12,4 @@ build
 .idea
 cmake-build-*
 *.so
+test.py

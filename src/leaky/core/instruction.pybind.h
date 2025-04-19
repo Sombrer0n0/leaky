@@ -20,9 +20,7 @@ struct LeakyInstruction {
     LeakyInstruction(
         stim::GateType gate_type,
         std::vector<stim::GateTarget> targets,
-        std::vector<double> gate_args);
-    LeakyInstruction(
-        const char *name, const std::vector<stim::GateTarget> targets, std::vector<double> gate_args);        
+        std::vector<double> gate_args);      
     stim::CircuitInstruction as_operation_ref() const;
     operator stim::CircuitInstruction() const;
 };
@@ -32,7 +30,5 @@ void pybind_instruction_methods(py::module &m, py::class_<LeakyInstruction> &c);
 
 }  // namespace leaky_pybind
 
-stim::GateTarget obj_to_gate_target(const pybind11::object &obj);
-stim::GateTarget handle_to_gate_target(const pybind11::handle &obj);
 
 #endif  // LEAKY_INSTRUCTION_PYBIND_H

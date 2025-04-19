@@ -30,10 +30,10 @@ struct LeakyPauliChannel {
     std::vector<std::vector<double>> cumulative_probs;
     std::vector<stim::GateTarget> independent_targets;
     bool is_single_qubit_channel;
-    bool is_independent_channel = false;
+    bool is_independent_channel;
 
     explicit LeakyPauliChannel(bool is_single_qubit_transition = true);
-    //explicit LeakyPauliChannel(bool is_single_qubit_transition = true, const std::vector<stim::GateTarget> targets);
+    explicit LeakyPauliChannel(const std::vector<stim::GateTarget>& targets, bool is_single_qubit_transition = true);
 
     void add_transition(uint8_t initial_status, uint8_t final_status, uint8_t pauli_channel_idx, double probability);
     [[nodiscard]] double get_prob_from_to(uint8_t initial_status, uint8_t final_status, uint8_t pauli_idx) const;

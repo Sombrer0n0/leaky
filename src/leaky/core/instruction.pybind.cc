@@ -1,53 +1,9 @@
 #include "leaky/core/instruction.pybind.h"
-
+#include "leaky/core/gatetarget_trans.h"
 #include <pybind11/cast.h>
 #include <pybind11/detail/common.h>
 #include <pybind11/pytypes.h>
 #include <pybind11/stl.h>
-
-// stim::GateTarget handle_to_gate_target(const pybind11::handle &obj) {
-//     try {
-//         std::cout<<"leaky:"<<typeid(obj).name()<<std::endl;
-//         return py::cast<stim::GateTarget>(obj);
-//     } catch (const pybind11::cast_error &ex) {
-//         std::cerr <<"cast fail2:"<<ex.what()<<std::endl;
-//     }
-//     try {
-//         return stim::GateTarget{py::cast<uint32_t>(obj)};
-//     } catch (const pybind11::cast_error &ex) {
-//     }
-//     throw std::invalid_argument(
-//         "target argument wasn't a qubit index, a result from a `stim.target_*` method, or a `stim.GateTarget`.");
-// }
-
-// stim::GateTarget leaky_pybind::obj_to_gate_target(const pybind11::object &obj) {
-//     return handle_to_gate_target(obj);
-// }
-using namespace stim;
-
-GateTarget handle_to_gate_target(const pybind11::handle &obj) {
-    try {
-        return pybind11::cast<GateTarget>(obj);
-    } catch (const pybind11::cast_error &ex) {
-    }
-    try {
-        return GateTarget{pybind11::cast<uint32_t>(obj)};
-    } catch (const pybind11::cast_error &ex) {
-    }
-    if (py::hasattr(obj, "value")) {
-        try {
-            auto v = py::cast<uint32_t>(obj.attr("value"));
-            return GateTarget{v};
-        } catch (const py::cast_error &) {
-        }
-    }
-    throw std::invalid_argument(
-        "target argument wasn't a qubit index, a result from a `stim.target_*` method, or a `stim.GateTarget`.");
-}
-
-GateTarget obj_to_gate_target(const pybind11::object &obj) {
-    return handle_to_gate_target(obj);
-}
 
 leaky_pybind::LeakyInstruction::LeakyInstruction(
     const char *name, const std::vector<pybind11::object> &init_targets,const std::vector<double> &gate_args)
@@ -55,11 +11,6 @@ leaky_pybind::LeakyInstruction::LeakyInstruction(
     for (const py::object &obj : init_targets) {
         targets.push_back(obj_to_gate_target(obj));
     }
-}
-
-leaky_pybind::LeakyInstruction::LeakyInstruction(
-    const char *name, const std::vector<stim::GateTarget> targets, std::vector<double> gate_args)
-        :gate_type(stim::GATE_DATA.at(name).id) ,targets(targets), gate_args(gate_args){
 }
 
 leaky_pybind::LeakyInstruction::LeakyInstruction(

@@ -57,6 +57,7 @@ set(PYTHON_API_FILES
         src/leaky/core/instruction.pybind.cc
         src/leaky/core/rand_gen.pybind.cc
         src/leaky/leaky.pybind.cc
+        src/leaky/core/gatetarget_trans.cc
         )
 
 

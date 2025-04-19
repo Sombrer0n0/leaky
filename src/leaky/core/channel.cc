@@ -60,7 +60,11 @@ std::string leaky::pauli_idx_to_string(uint8_t idx, bool is_single_qubit_channel
 }
 
 leaky::LeakyPauliChannel::LeakyPauliChannel(bool is_single_qubit_transition)
-    : initial_status_vec(0), transitions(0), cumulative_probs(0), is_single_qubit_channel(is_single_qubit_transition) {
+    : initial_status_vec(0), transitions(0), cumulative_probs(0),independent_targets(0) ,is_independent_channel(false),is_single_qubit_channel(is_single_qubit_transition) {
+}
+
+leaky::LeakyPauliChannel::LeakyPauliChannel(const std::vector<stim::GateTarget>& targets, bool is_single_qubit_transition)
+    : initial_status_vec(0),transitions(0),cumulative_probs(0),independent_targets(targets),is_independent_channel(true),is_single_qubit_channel(is_single_qubit_transition){
 }
 
 void leaky::LeakyPauliChannel::add_transition(
