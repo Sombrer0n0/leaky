@@ -11,6 +11,9 @@
 
 namespace leaky {
 
+
+
+
 struct Simulator {
     uint32_t num_qubits;
     std::vector<uint8_t> leakage_status;
@@ -20,6 +23,9 @@ struct Simulator {
 
     explicit Simulator(uint32_t num_qubits);
 
+    struct State;
+    State save_state() const;
+    void load_state(const State &snap);
     void bind_leaky_channel(const stim::CircuitInstruction& ideal_inst, const LeakyPauliChannel& channel);
     void apply_1q_leaky_pauli_channel(stim::SpanRef<const stim::GateTarget> targets, const LeakyPauliChannel& channel);
     void apply_2q_leaky_pauli_channel(stim::SpanRef<const stim::GateTarget> targets, const LeakyPauliChannel& channel);
@@ -33,6 +39,22 @@ struct Simulator {
    private:
     void handle_transition(
         uint8_t cur_status, uint8_t next_status, stim::SpanRef<const stim::GateTarget> target, const char* pauli);
+};
+
+struct Simulator::State{
+    stim::Tableau<stim::MAX_BITWORD_WIDTH> inv_tableau;
+    std::vector<uint8_t> leakage_status;
+    std::vector<uint8_t> leakage_masks_record;
+    stim::MeasureRecord meas_record;
+    inline State():inv_tableau(0) {}
+    inline State(const stim::Tableau<stim::MAX_BITWORD_WIDTH> &tab,
+        std::vector<uint8_t> ls,
+        std::vector<uint8_t> lm,
+        const stim::MeasureRecord &rec)
+      : inv_tableau(tab),
+        leakage_status(std::move(ls)),
+        leakage_masks_record(std::move(lm)),
+        meas_record(rec) {}
 };
 
 }  // namespace leaky

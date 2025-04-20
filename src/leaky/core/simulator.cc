@@ -23,6 +23,21 @@ leaky::Simulator::Simulator(uint32_t num_qubits)
       bound_leaky_channels({}) {
 }
 
+leaky::Simulator::State leaky::Simulator::save_state() const {
+    return State{tableau_simulator.inv_state, leakage_status, leakage_masks_record, tableau_simulator.measurement_record};
+}
+
+void leaky::Simulator::load_state(const leaky::Simulator::State& snap) {
+    if (snap.inv_tableau.num_qubits != num_qubits) {
+        throw std::invalid_argument("Snap shot qubit number mismatch.");
+    }
+    tableau_simulator.inv_state = snap.inv_tableau;
+    leakage_status = snap.leakage_status;
+    leakage_masks_record = snap.leakage_masks_record;
+    tableau_simulator.measurement_record = snap.meas_record;
+}
+
+
 void leaky::Simulator::handle_transition(
     uint8_t cur_status, uint8_t next_status, stim::SpanRef<const stim::GateTarget> target, const char* pauli) {
     switch (leaky::get_transition_type(cur_status, next_status)) {

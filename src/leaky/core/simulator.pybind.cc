@@ -69,6 +69,15 @@ leaky::Simulator create_simulator(uint32_t num_qubits, const pybind11::object &s
 }
 
 void leaky_pybind::pybind_simulator_methods(py::module &m, py::class_<leaky::Simulator> &s) {
+
+
+    py::class_<leaky::Simulator::State>(m, "SimulatorState")
+        .def(py::init<>())
+        .def_readwrite("tableau",              &leaky::Simulator::State::inv_tableau)
+        .def_readwrite("leakage_status",       &leaky::Simulator::State::leakage_status)
+        .def_readwrite("leakage_masks_record", &leaky::Simulator::State::leakage_masks_record)
+        .def_readwrite("measurement_record",   &leaky::Simulator::State::meas_record);
+
     py::enum_<leaky::ReadoutStrategy>(m, "ReadoutStrategy", py::arithmetic())
         .value("RawLabel", leaky::ReadoutStrategy::RawLabel)
         .value("RandomLeakageProjection", leaky::ReadoutStrategy::RandomLeakageProjection)
@@ -76,6 +85,9 @@ void leaky_pybind::pybind_simulator_methods(py::module &m, py::class_<leaky::Sim
         .export_values();
 
     s.def(py::init(&create_simulator), py::arg("num_qubits"), pybind11::kw_only(), py::arg("seed") = pybind11::none());
+    s.def("save_state",   &leaky::Simulator::save_state);
+    s.def("load_state",   &leaky::Simulator::load_state, py::arg("snap"));
+
     s.def(
         "do_circuit",
         [](leaky::Simulator &self, const py::object &circuit) {
