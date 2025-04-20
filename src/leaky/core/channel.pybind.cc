@@ -28,6 +28,7 @@ void leaky_pybind::pybind_channel_methods(py::module &m, py::class_<leaky::Leaky
         "Construct a LeakyPauliChannel bound to the given independent targets."
     );
     c.def_property_readonly("num_transitions", &leaky::LeakyPauliChannel::num_transitions);
+    c.def_readonly("is_single_channel", &leaky::LeakyPauliChannel::is_single_qubit_channel);
     c.def(
         "add_transition",
         &leaky::LeakyPauliChannel::add_transition,
