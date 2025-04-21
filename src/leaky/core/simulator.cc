@@ -165,11 +165,22 @@ void leaky::Simulator::do_gate(const stim::CircuitInstruction& inst, bool look_u
             continue;
         }
         const auto& channels = it->second;
-        for (const auto& c: channels)
-        if (is_single_qubit_gate) {
-            apply_1q_leaky_pauli_channel(split_targets, c);
-        } else {
-            apply_2q_leaky_pauli_channel(split_targets, c);
+        for (const auto& c: channels){
+            if (c.is_independent_channel){
+                stim::SpanRef<const stim::GateTarget> split_targets_tmp(c.independent_targets);
+                if (c.is_single_qubit_channel) {
+                    apply_1q_leaky_pauli_channel(split_targets_tmp, c);
+                } else {
+                    apply_2q_leaky_pauli_channel(split_targets_tmp, c);
+                }
+            }
+            else{
+                if (is_single_qubit_gate) {
+                    apply_1q_leaky_pauli_channel(split_targets, c);
+                } else {
+                    apply_2q_leaky_pauli_channel(split_targets, c);
+                }
+            }
         }
     }
 }

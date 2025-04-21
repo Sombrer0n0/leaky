@@ -13,3 +13,6 @@ build
 cmake-build-*
 *.so
 test.py
+*Zone.Identifier
+simulation.py
+circuit.py
